@@ -1,46 +1,42 @@
 #include <mpi.h>
+#include <omp.h>
 #include <stdio.h>
 
-#ifndef _TIMER_H
-#define _TIMER_H_
+int source, my_rank, nodeSize = 0;
 
-#include <sys/time.h>
+double trapGuidedSchedule(double xLo, double xHi, int numIntervals);
+double f(double x);
 
-#define GET_TIME(now){ \
-	struct timeval t; \
-	gettimeofday(&t, NULL); \
-	now = t.tv_sec + t.tv_usec/1000000.0; \
+int main() {
+	double resultSum;
+    	MPI_Init(NULL, NULL);
+    	MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+    	MPI_Comm_size (MPI_COMM_WORLD, &nodeSize);
+
+	double result = trapGuidedSchedule(0, 10, 100000000); //100 million
+
+	MPI_Reduce(&result, &resultSum, nodeSize, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	printf("sum: %d, integral: %d", resultSum, integrate(0, 10));
+	MPI_Finalize();
+
 }
-
-#endif
-
 
 double trapGuidedSchedule(double xLo, double xHi, int numIntervals) {
 	double sum; //sum up all of the trapezoid areas
 	double width, x; //working variables for Trapezdoial Approximation
-	int percentProgress = -1;
+	int i;
 
 	//initialization
 	width = (xHi - xLo) / numIntervals;
 	sum = (f(xLo) + f(xHi)) / 2.0; //start with endpoints;
 
-	GET_TIME(startTime);
 
 	//calculate the interior f(x)'s
-#pragma omp parallel for schedule(guided, 1) num_threads(threadCount) default(none) private(x) reduction(+:sum)
-	for (int i = 1; i < numIntervals - 1; i++) {
-		if (omp_get_thread_num() == 0 && (int)(((double)i / numIntervals) * 100) > percentProgress) {
-			percentProgress = (int)(((double)i / numIntervals) * 100);
-			cout << '\r' << percentProgress << "% finished" << flush;
-		}
+#pragma omp parallel for schedule(guided, 1) num_threads(nodeSize)  private(x, i) reduction(+:sum)
+	for (i = my_rank; i < numIntervals - 1; i += nodeSize) {
 		x = xLo + i * width;
 		sum += f(x);
 	}
-
-	cout << endl;
-
-	GET_TIME(endTime);
-	time = (double)(endTime - startTime);
 
 	//calculate the area of all
 	sum *= width; //multiply all by width
