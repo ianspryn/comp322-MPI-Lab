@@ -40,12 +40,13 @@ int main() {
 	//1.2 init. probability calculators
 	int totalRuns = 0;
 
-	//1.3 init slave counters
+	//1.3 init slave counters and ready vars
+	int readyInt = 0;
 	int cntr1, cntr2, cntr3, cntr4, cntr5, cntr6, cntr7, cntr8, cntr9, cntr10 = 0;
 	//1.4 init reduce counters
 	int totalCntr1, totalCntr2, totalCntr3, totalCntr4, totalCntr5, totalCntr6, totalCntr7, totalCntr8, totalCntr9, totalCntr10 = 0;
 
-	//1.5 define loop variables
+	//1.5 initialize loop variables
 	int a, b, c, d, e, f, g;
 
 	//SET THREAD NUMBER HERE
@@ -53,22 +54,27 @@ int main() {
 	omp_set_num_threads(threadNum);
 
 
+	//2.0 Run Loops
 	//Master does outermost loop...
 	//sends work to the ancillaries...
 
 	//If(you're the master node) {
 	if (myRank == 0) {
-		//	Run “a” = 0– > 46
+		//	Run “a” = 0 –-> 46
 		//	Send “a” to the slaves
 		for (a = 0; a < 46; a++) {
-			MPI_Send(a, 1, MPI_Int, 1, 0, MPI_COMM_WORLD);
+			//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+			MPI_Receive(readyInt, 1, MPI_Int, readyInt, 1, MPI_COMM_WORLD);
+			//MPI_Send(void* data,int count,MPI_Datatype datatype, int destination,int tag, MPI_Comm communicator)
+			MPI_Send(a, 1, MPI_Int, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD);
 		}
 
-	} else {
-		
+	}
+	else {
+
 		//	  Receive “a”
 		MPI_Recv(a, 1, MPI_Int, 0, 0);
-		
+
 		//	  Init a struct
 		PokerHand pkh;	//Poker hand object
 		const int num = 7;		//number of cards in the hand
@@ -116,33 +122,63 @@ reduction(+:totalRuns, cntr1, cntr2, cntr3, cntr4, cntr5, cntr6, cntr7, cntr8, c
 
 								if (royalFlush(pkh)) {
 									cntr1++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isStraightFlush(pkh)) {
 									cntr2++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFourOfAKind(pkh)) {
 									cntr3++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFullHouse(pkh)) {
 									cntr4++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFlush(pkh)) {
 									cntr5++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isStraight(pkh)) {
 									cntr6++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (threeOfKind(pkh)) {
 									cntr7++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (two_pair(pkh)) {
 									cntr8++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isOnePair(pkh)) {
 									cntr9++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isHighCard(pkh)) {
 									cntr10++;
+									readyInt = myID;
+									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
+									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
 								}
 							}
 						}
@@ -150,10 +186,10 @@ reduction(+:totalRuns, cntr1, cntr2, cntr3, cntr4, cntr5, cntr6, cntr7, cntr8, c
 				}
 			}
 		}
-		
 
 
-	}//end else
+
+	}
 
 	//REDUCE
 	MPI_Reduce(&cntr1, &totalCntr1, nodeSize, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
