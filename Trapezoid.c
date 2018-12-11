@@ -6,6 +6,7 @@ int source, my_rank, nodeSize = 0;
 
 double trapGuidedSchedule(double xLo, double xHi, int numIntervals);
 double f(double x);
+double integrate(double xLo, double xHi);
 
 int main() {
 	double resultSum;
@@ -13,10 +14,12 @@ int main() {
     	MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
     	MPI_Comm_size (MPI_COMM_WORLD, &nodeSize);
 
-	double result = trapGuidedSchedule(0, 10, 100000000); //100 million
+	double result = trapGuidedSchedule(0, 10, 10000000); //10 million
 
 	MPI_Reduce(&result, &resultSum, nodeSize, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-	printf("sum: %d, integral: %d", resultSum, integrate(0, 10));
+	if (my_rank == 0) {
+		printf("sum: %f, integral: %f\n", resultSum, integrate(0, 10));
+	}
 	MPI_Finalize();
 
 }
@@ -32,7 +35,7 @@ double trapGuidedSchedule(double xLo, double xHi, int numIntervals) {
 
 
 	//calculate the interior f(x)'s
-#pragma omp parallel for schedule(guided, 1) num_threads(nodeSize)  private(x, i) reduction(+:sum)
+#pragma omp parallel for schedule(guided, 1) num_threads(4)  private(x, i) reduction(+:sum)
 	for (i = my_rank; i < numIntervals - 1; i += nodeSize) {
 		x = xLo + i * width;
 		sum += f(x);
