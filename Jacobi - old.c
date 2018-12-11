@@ -55,24 +55,16 @@ int main() {
 	JacobiDynamicMethod(); //THE HEART OF THE PROGRAM
 	printf("Hello from node %d !!", rank);
 	MPI_Finalize();
-	printf("HELLO FROM AFTER EVERYTHING");
-	//output the result
-	FILE *file;
-	char fileName[] = "MPI_OMP.ppm";
-	int err = fopen_s(&file, fileName, "w");
-	if (file == NULL) {
-		printf("Error opening file. (Do you have the file open?)");
-		exit(1);
-	} else {
-		fprintf(file, "P3\n");
-		fprintf(file, "%d %d\n", maxCols, maxRows);
-		fprintf(file, "#Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP322.A MPP Capstone\n");
-		fprintf(file, "255\n");
-		for (i = 0; i < maxRows * maxCols; i++) {
-			fprintf(file, "%d 0 %d", (*(masterArray + j + i * maxCols)), (255 - *(masterArray + j + i * maxCols)));
-		}
+printf("HELLO FROM AFTER EVERYTHING");
+	printf("P3\n");
+	printf("%d %d\n", maxCols, maxRows);
+	printf("#Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP322.A MPP Capstone\n");
+	printf("255\n");
+	for (i = 0; i < maxRows * maxCols; i++) {
+		float red = *(masterArray + i);
+		float blue = 255 - *(masterArray + i);
+		printf("%f 0 %f", red, blue);
 	}
-	fclose(file);
 	return 0;
 
 }
@@ -101,7 +93,7 @@ void JacobiDynamicMethod() {
 		if (rank == 0) {
 			masterArray = (float*)malloc(maxRows * maxCols * sizeof(float));
 		}
-		if (rank == 0 || rank = world_size - 1) {
+		if (rank == 0 || rank == world_size - 1) {
 			array = (float*)malloc(nodeSizeOuter * sizeof(float));
 			arrayNew = (float*)malloc(nodeSizeOuter * sizeof(float));
 		} else {
@@ -160,7 +152,7 @@ void JacobiDynamicMethod() {
 			//only send to the node above me if I am NOT the top node
 			if (rank < world_size - 1) {
 				//MPI_Send((array + maxCols / world_size), maxCols, MPI_DOUBLE, rank + 1, 0, MPI_COMM_WORLD);
-				MPI_Send((array + (maxRows - 1) * maxCols), maxCols, MPI_DOUBLE, rank + 1, 0, MPI_COMM_WORLD);
+				MPI_Send((array + (maxRows / world_size - 1) * maxCols), maxCols, MPI_DOUBLE, rank + 1, 0, MPI_COMM_WORLD);
 			}
 			if (rank > 0) {
 				MPI_Recv(array, maxCols, MPI_DOUBLE, rank - 1, 0, MPI_COMM_WORLD, &status);
@@ -171,16 +163,16 @@ void JacobiDynamicMethod() {
 				MPI_Send((array + maxCols), maxCols, MPI_DOUBLE, rank + 1, 1, MPI_COMM_WORLD);
 			}
 			if (rank < world_size - 1) {
-				MPI_Recv((array + (maxRows - 1) * maxCols), maxCols, MPI_DOUBLE, rank + 1, 1, MPI_COMM_WORLD, &status);
+				MPI_Recv((array + (maxRows / world_size - 1) * maxCols), maxCols, MPI_DOUBLE, rank + 1, 1, MPI_COMM_WORLD, &status);
 			}
 #pragma omp parallel num_threads(4) shared(maxDiff) firstprivate(diff)
 {
 #pragma omp for schedule(dynamic, 1)
 			for (i = iStart; i < iEnd; i++) {
 				for (j = 1; j < maxCols - 1; j++) {
-					SetCell(i, j, ((getCell(i, j - 1) + getCell(i, j + 1) + getCell(i - 1, j) + getCell(i + 1, j)) / 4.0f));
-					if (diff < fabs(getCell(i, j) - *(arrayNew + j + i * maxCols))) {
-						diff = fabs(getCell(i, j) - *(arrayNew + j + i * maxCols)); //get max diff of each thread
+					SetCell(i, j, ((GetCell(i, j - 1) + GetCell(i, j + 1) + GetCell(i - 1, j) + GetCell(i + 1, j)) / 4.0f));
+					if (diff < fabs(GetCell(i, j) - *(arrayNew + j + i * maxCols))) {
+						diff = fabs(GetCell(i, j) - *(arrayNew + j + i * maxCols)); //get max diff of each thread
 					}
 				}
 			}
