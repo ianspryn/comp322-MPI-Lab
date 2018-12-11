@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "POKER_HAND_ADT.h"
-#include <omp.h
+#include <omp.h>
 #include <mpi.h>
 using namespace std;
 
 
 //member variables
-int source, myRank, nodeSize = 0
+int source, myRank, nodeSize = 0;
 
 
 /************************************************
@@ -60,20 +60,20 @@ int main() {
 
 	//If(you're the master node) {
 	if (myRank == 0) {
-		//	Run “a” = 0 –-> 46
-		//	Send “a” to the slaves
+		//	Run ï¿½aï¿½ = 0 ï¿½-> 46
+		//	Send ï¿½aï¿½ to the slaves
 		for (a = 0; a < 46; a++) {
 			//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-			MPI_Receive(readyInt, 1, MPI_Int, readyInt, 1, MPI_COMM_WORLD);
+			MPI_Recv(readyInt, 1, MPI_INT, readyInt, 1, MPI_COMM_WORLD);
 			//MPI_Send(void* data,int count,MPI_Datatype datatype, int destination,int tag, MPI_Comm communicator)
-			MPI_Send(a, 1, MPI_Int, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD);
+			MPI_Send(a, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD);
 		}
 
 	}
 	else {
 
-		//	  Receive “a”
-		MPI_Recv(a, 1, MPI_Int, 0, 0);
+		//	  Receive ï¿½aï¿½
+		MPI_Recv(a, 1, MPI_INT, 0, 0);
 
 		//	  Init a struct
 		PokerHand pkh;	//Poker hand object
@@ -124,61 +124,61 @@ reduction(+:totalRuns, cntr1, cntr2, cntr3, cntr4, cntr5, cntr6, cntr7, cntr8, c
 									cntr1++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isStraightFlush(pkh)) {
 									cntr2++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFourOfAKind(pkh)) {
 									cntr3++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFullHouse(pkh)) {
 									cntr4++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isFlush(pkh)) {
 									cntr5++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isStraight(pkh)) {
 									cntr6++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (threeOfKind(pkh)) {
 									cntr7++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (two_pair(pkh)) {
 									cntr8++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isOnePair(pkh)) {
 									cntr9++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 								else if (isHighCard(pkh)) {
 									cntr10++;
 									readyInt = myID;
 									//MPI_Recv(void* data,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm communicator,MPI_Status* status)
-									MPI_Receive(readyInt, 1, MPI_Int, readyInt, 0, MPI_COMM_WORLD);
+									MPI_Recv(readyInt, 1, MPI_INT, readyInt, 0, MPI_COMM_WORLD);
 								}
 							}
 						}
