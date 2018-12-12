@@ -1,5 +1,7 @@
 //Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP 322.A
 
+//To achieve a serial runtime, simply run this program and set the number of nodes to be 1 instead.
+
 #include <mpi.h>
 #include <omp.h>
 #include <stdio.h>
@@ -147,6 +149,7 @@ int main() {
 
 }
 
+//create declare and initialize a new array
 double* Jacobi(int maxRows, int maxCols, int initTemperature) {
 	double *array = (double*)malloc(maxRows * maxCols * sizeof(double));
 	for (i = 0; i < maxRows * maxCols; i++) {
@@ -155,6 +158,7 @@ double* Jacobi(int maxRows, int maxCols, int initTemperature) {
 	return array;
 }
 
+//Generate the next generation of a board
 double DoOnePass(double* nodeArray, double* nodeArrayNext, int maxRows, int maxCols) {
 
 	double average, localDiff, localMaxDiff = 0;
@@ -183,11 +187,12 @@ double GetCell(double *array, int maxCols, int row, int col) {
 	return array[row * maxCols + col];
 }
 
+//Create a PPM file using all of the individual boards pieced together
 void ToPPM(double* masterArray, double timeTaken, int maxRows, int maxCols) {
 	printf("P3\n");
 	printf("%d %d\n", maxCols, maxRows);
 	printf("#Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP322.A MPP Capstone\n");
-	printf("#Time taken: %f\n", timeTaken);
+	printf("#Time taken: %f\n", timeTaken); //output the time taken
 	printf("255\n");
 	for (i = 0; i < maxRows * maxCols; i++) {
 		int red = (int)ceil(masterArray[i]);
