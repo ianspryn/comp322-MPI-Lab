@@ -1,3 +1,4 @@
+//Trapezoid-Serial.c
 // COMP 322 ~ Trapezoidal Program Serial
 // Team F: Ian Spryn, Emily Wasylenko, Mitchell Harvey, Kaileigh Macleod
 

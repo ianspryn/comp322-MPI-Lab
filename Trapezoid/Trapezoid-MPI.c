@@ -1,3 +1,4 @@
+//Trapezoid-MPI.c
 // COMP 322 ~ Trapezoidal Program for simply MPI
 // Team F: Ian Spryn, Emily Wasylenko, Mitchell Harvey, Kaileigh Macleod
 

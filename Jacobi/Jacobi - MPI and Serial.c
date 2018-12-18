@@ -1,5 +1,5 @@
+//Jacobi - MPI and Serial.c
 //Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP 322.A
-
 //To achieve a serial runtime, simply run this program and set the number of nodes to be 1 instead.
 
 #include <mpi.h>

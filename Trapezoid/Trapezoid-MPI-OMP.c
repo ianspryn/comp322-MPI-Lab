@@ -1,3 +1,4 @@
+//Trapezoid-MPI-OMP.c
 //COMP 322 ~ Trapezoidal Program for OMP & MPI
 // Team F: Ian Spryn, Emily Wasylenko, Mitchell Harvey
 

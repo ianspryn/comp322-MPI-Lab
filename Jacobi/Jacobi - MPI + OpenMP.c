@@ -1,3 +1,4 @@
+//Jacobi - MPI + OpenMP.c
 //Ian Spryn, Mitchell Harvey, Emily Wasylenko, Kaileigh MacLeod ~ COMP 322.A
 
 #include <mpi.h>

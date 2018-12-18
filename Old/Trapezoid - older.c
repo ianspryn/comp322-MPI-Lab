@@ -14,19 +14,13 @@ int main() {
     	MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
     	MPI_Comm_size (MPI_COMM_WORLD, &nodeSize);
 
+	double result = trapGuidedSchedule(0, 10, 10000000); //10 million
 
-	printf("test\n");
-	double result = trapGuidedSchedule(1, 10, 10000000); //10 million
-	//we're supposed to be reducing result into resultSum
-	//but there is only one result
-	//what if we commented out line below and instead of resultSum, did result
 	MPI_Reduce(&result, &resultSum, nodeSize, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 	if (my_rank == 0) {
-	  printf("test\n");
-	  	printf("sum: %f, integral: %f\n", resultSum, integrate(1, 10));
+		printf("sum: %f, integral: %f\n", resultSum, integrate(0, 10));
 	}
 	MPI_Finalize();
-
 
 }
 
@@ -41,7 +35,7 @@ double trapGuidedSchedule(double xLo, double xHi, int numIntervals) {
 
 
 	//calculate the interior f(x)'s
-#pragma omp parallel for schedule(guided, 1) num_threads(4)  reduction(+:sum) //private(x,i)
+#pragma omp parallel for schedule(guided, 1) num_threads(4)  private(x, i) reduction(+:sum)
 	for (i = my_rank; i < numIntervals - 1; i += nodeSize) {
 		x = xLo + i * width;
 		sum += f(x);
@@ -58,13 +52,5 @@ double f(double x) {
 }
 
 double integrate(double xLo, double xHi) {
-  return ((exp(-xHi / 10) * (10 * sin(5 * xHi) + 500 * cos(5 * xHi))) / -2501) - ((exp(-xLo / 10) * (10 * sin(5 * xLo) + 500 * cos(5 * xLo))) / -2501);
-  //double a = -0.1;
-  //double b = 5;
-
-  //  double answerL = (exp(a*xLo))*(a*sin(b*xLo)-(b*cos(b*xLo)))/(a*a+b*b);
-  //  double answerH = (exp(a*xHi))*(a*sin(b*xHi)-(b*cos(b*xHi)))/(a*a+b*b);
-
-  //return answerH - answerL;
-
+	return ((exp(-xHi / 10) * (10 * sin(5 * xHi) + 500 * cos(5 * xHi))) / -2501) - ((exp(-xLo / 10) * (10 * sin(5 * xLo) + 500 * cos(5 * xLo))) / -2501);
 }

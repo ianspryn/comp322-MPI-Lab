@@ -1,3 +1,4 @@
+//Texas-Serial.c
 // COMP322.A ~ Texas Hold'Em Driver "Serial"
 // (we specified this to run with 1 node in our mpirun command: "mpirun -np 1 ...etc")
 // Team F: Ian Spryn, Emily Wasylenko, Mitchell Harvey, Kaileigh Macleod
